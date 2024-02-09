@@ -11,9 +11,9 @@ module divider_unsigned (
     output wire [31:0] o_quotient
 );
     // creating wire arrays to connect modules
-    logic [31:0] div_array [33];
-    logic [31:0] rem_array [33];
-    logic [31:0] quo_array [33];
+    wire [31:0] div_array[33];
+    wire [31:0] rem_array[33];
+    wire [31:0] quo_array[33];
 
     // initializing wires as applicable
     assign div_array[0] = i_dividend;
@@ -51,27 +51,39 @@ module divu_1iter (
     output wire [31:0] o_remainder,
     output wire [31:0] o_quotient
 );
-    /*
-    for (int i = 0; i < 32; i++) {
-        remainder = (remainder << 1) | ((dividend >> 31) & 0x1);
-        if (remainder < divisor) {
-            quotient = (quotient << 1);
-        } else {
-            quotient = (quotient << 1) | 0x1;
-            remainder = remainder - divisor;
-        }
-        dividend = dividend << 1;
-    }
-    */
+    // creating necesarry logic variables
+    logic [31:0] quo, rem, div;
     
+    // logic
     always_comb begin
-        if (((i_remainder << 1) | ((i_dividend >> 31) & 0x1)) < i_divisor) begin
-            assign o_quotient = i_quotient << 1;
-            assign o_remainder = i_remainder
+        rem = ((i_remainder << 1) | ((i_dividend >> 31) & 32'b1));
+        if (rem < i_divisor) begin
+            quo = i_quotient << 1;
         end else begin
-            assign o_quotient = ((i_quotient << 1) | (0x1));
-            assign o_remainder = i_remainder - i_divisor;
+            quo = ((i_quotient << 1) | 32'b1);
+            rem = rem - i_divisor;
         end
-        assign o_dividend = i_dividend << 1;
+        div = i_dividend << 1;
     end
+
+    // connect output wires
+    assign o_quotient = quo;
+    assign o_dividend = div;
+    assign o_remainder = rem;
+
 endmodule
+
+
+/*
+Division algorithm
+for (int i = 0; i < 32; i++) {
+    remainder = (remainder << 1) | ((dividend >> 31) & 32'b1);
+    if (remainder < divisor) {
+        quotient = (quotient << 1);
+    } else {
+        quotient = (quotient << 1) | 0x1;
+        remainder = remainder - divisor;
+    }
+    dividend = dividend << 1;
+}
+*/
