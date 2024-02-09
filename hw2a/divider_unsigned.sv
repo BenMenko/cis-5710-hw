@@ -39,6 +39,7 @@ module divider_unsigned (
     // outputting quotient and remainder wires, div_array[32] is unconnected
     assign o_quotient = quo_array[32];
     assign o_remainder = rem_array[32];
+    
 endmodule
 
 
@@ -53,7 +54,7 @@ module divu_1iter (
 );
     // creating necesarry logic variables
     logic [31:0] quo, rem, div;
-    
+
     // logic
     always_comb begin
         rem = ((i_remainder << 1) | ((i_dividend >> 31) & 32'b1));
