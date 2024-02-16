@@ -12,6 +12,9 @@ module gp1(input wire a, b,
    assign p = a | b;
 endmodule
 
+
+
+
 /**
  * Computes aggregate generate/propagate signals over a 4-bit window.
  * @param gin incoming generate signals
@@ -27,8 +30,31 @@ module gp4(input wire [3:0] gin, pin,
            output wire [2:0] cout);
 
    // TODO: your code here
-
+   logic carry = cin;
+   logic p0 = pin[0];
+   logic p1 = pin[1];
+   logic p2 = pin[2];
+   logic p3 = pin[3];
+   logic g0 = gin[0];
+   logic g1 = gin[1];
+   logic g2 = gin[2];
+   logic g3 = gin[3];
+   logic c1out, c2out, c3out, pOut, gOut;
+   always_comb begin
+      c1out = (carry & p0) || g0;
+      c2out = (g0 & p1) || g1 || (carry & p0 & p1);
+      c3out = g2 || (g1 & p2) || (g0 & p1 & p2) || (carry & p0 & p1 & p2);
+      pOut = p0 & p1 & p2 & p3;
+      gOut = (g0 & p1 & p2 & p3) || (p3 & g1 & p2) || (g2 & p3) || g3;
+   end
+   assign gout = gOut;
+   assign pout = pOut;
+   assign cout[2] = c3out;
+   assign cout[1] = c2out;
+   assign cout[0] = c1out;
 endmodule
+
+
 
 /** Same as gp4 but for an 8-bit window instead */
 module gp8(input wire [7:0] gin, pin,
@@ -39,6 +65,8 @@ module gp8(input wire [7:0] gin, pin,
    // TODO: your code here
 
 endmodule
+
+
 
 module cla
   (input wire [31:0]  a, b,
