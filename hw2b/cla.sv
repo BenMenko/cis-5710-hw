@@ -39,19 +39,19 @@ module gp4(input wire [3:0] gin, pin,
    logic g1 = gin[1];
    logic g2 = gin[2];
    logic g3 = gin[3];
-   logic c1out, c2out, c3out, pOut, gOut;
+   logic cout0, cout1, cout2, pOut, gOut;
    always_comb begin
-      c1out = (carry & p0) || g0;
-      c2out = (g0 & p1) || g1 || (carry & p0 & p1);
-      c3out = g2 || (g1 & p2) || (g0 & p1 & p2) || (carry & p0 & p1 & p2);
-      pOut = p0 & p1 & p2 & p3;
-      gOut = (g0 & p1 & p2 & p3) || (p3 & g1 & p2) || (g2 & p3) || g3;
+      cout0 = (g0 || (cin & p0));
+      cout1 = (g1 || (p1 & cout0));
+      cout2 = (g2 || (p2 & cout1));
+      // add logic for gOut and pOut
+
    end
    assign gout = gOut;
    assign pout = pOut;
-   assign cout[2] = c3out;
-   assign cout[1] = c2out;
-   assign cout[0] = c1out;
+   assign cout[2] = cout2;
+   assign cout[1] = cout1;
+   assign cout[0] = cout0;
 endmodule
 
 
