@@ -42,8 +42,6 @@ module gp4(input wire [3:0] gin, pin,
    assign cout[0] = c1;
 endmodule
 
-
-/** Same as gp4 but for an 8-bit window instead */
 module gp8(input wire [7:0] gin, pin,
            input wire cin,
            output wire gout, pout,
@@ -71,15 +69,87 @@ module gp8(input wire [7:0] gin, pin,
    assign pout = p_out;
 endmodule
 
+module gp32(input wire [31:0] gin, pin,
+           input wire cin,
+           output wire [31:0] cout);
+   logic c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31;
+   always_comb begin
+      c0 = cin;
+      c1 = (gin[0] | (pin[0] & c0));
+      c2 = (gin[1] | (pin[1] & c1));
+      c3 = (gin[2] | (pin[2] & c2));
+      c4 = (gin[3] | (pin[3] & c3));
+      c5 = (gin[4] | (pin[4] & c4));
+      c6 = (gin[5] | (pin[5] & c5));
+      c7 = (gin[6] | (pin[6] & c6));
+      c8 = (gin[7] | (pin[7] & c7));
+      c9 = (gin[8] | (pin[8] & c8));
+      c10 = (gin[9] | (pin[9] & c9));
+      c11 = (gin[10] | (pin[10] & c10));
+      c12 = (gin[11] | (pin[11] & c11));
+      c13 = (gin[12] | (pin[12] & c12));
+      c14 = (gin[13] | (pin[13] & c13));
+      c15 = (gin[14] | (pin[14] & c14));
+      c16 = (gin[15] | (pin[15] & c15));
+      c17 = (gin[16] | (pin[16] & c16));
+      c18 = (gin[17] | (pin[17] & c17));
+      c19 = (gin[18] | (pin[18] & c18));
+      c20 = (gin[19] | (pin[19] & c19));
+      c21 = (gin[20] | (pin[20] & c20));
+      c22 = (gin[21] | (pin[21] & c21));
+      c23 = (gin[22] | (pin[22] & c22));
+      c24 = (gin[23] | (pin[23] & c23));
+      c25 = (gin[24] | (pin[24] & c24));
+      c26 = (gin[25] | (pin[25] & c25));
+      c27 = (gin[26] | (pin[26] & c26));
+      c28 = (gin[27] | (pin[27] & c27));
+      c29 = (gin[28] | (pin[28] & c28));
+      c30 = (gin[29] | (pin[29] & c29));
+      c31 = (gin[30] | (pin[30] & c30));
+   end
+   assign cout[0] = c0;
+   assign cout[1] = c1;
+   assign cout[2] = c2;
+   assign cout[3] = c3;
+   assign cout[4] = c4;
+   assign cout[5] = c5;
+   assign cout[6] = c6;
+   assign cout[7] = c7;
+   assign cout[8] = c8;
+   assign cout[9] = c9;
+   assign cout[10] = c10;
+   assign cout[11] = c11;
+   assign cout[12] = c12;
+   assign cout[13] = c13;
+   assign cout[14] = c14;
+   assign cout[15] = c15;
+   assign cout[16] = c16;
+   assign cout[17] = c17;
+   assign cout[18] = c18;
+   assign cout[19] = c19;
+   assign cout[20] = c20;
+   assign cout[21] = c21;
+   assign cout[22] = c22;
+   assign cout[23] = c23;
+   assign cout[24] = c24;
+   assign cout[25] = c25;
+   assign cout[26] = c26;
+   assign cout[27] = c27;
+   assign cout[28] = c28;
+   assign cout[29] = c29;
+   assign cout[30] = c30;
+   assign cout[31] = c31;
+endmodule
+
 
 module cla
   (input wire [31:0]  a, b,
    input wire         cin,
    output wire [31:0] sum);
 
-   // 32 1-bit modules
-   wire level_one_g[32];
-   wire level_one_p[32];
+   // 32 x 1-bit modules
+   wire [31:0] level_one_g;
+   wire [31:0] level_one_p;
    genvar i;
    generate
       for (i = 0; i < 32; i = i + 1) begin
@@ -87,57 +157,16 @@ module cla
       end
    endgenerate
 
-   // 4 8-bit modules
-   wire level_two_g[4];
-   wire level_two_p[4];
-   wire [6:0] level_two_c[4];
-   genvar k;
-   generate
-      for (k = 0; k < 4; k = k + 1) begin
-         gp8 bit8(.gin(level_one_g[8*k+7 : 8*k]), .pin(level_one_p[8*k+7 : 8*k]), .cin(cin), .gout(level_two_g[k]), .pout(level_two_p[k]),  .cout(level_two_c[k]));
-      end
-   endgenerate
+   // 1 x 32-bit module
+   wire [31:0] c;
+   gp32 full_add(.gin(level_one_g), .pin(level_one_p), .cin(cin), .cout(c));
 
-   logic [31:0] c;
-   always_comb begin
-      c[0] = level_two_c[0][0];
-      c[1] = level_two_c[0][1];
-      c[2] = level_two_c[0][2];
-      c[3] = level_two_c[0][3];
-      c[4] = level_two_c[0][4];
-      c[5] = level_two_c[0][5];
-      c[6] = level_two_c[0][6];
-      c[7] = (cin & level_two_p[0]) | level_two_g[0];
-      c[8] = level_two_c[1][0];
-      c[9] = level_two_c[1][1];
-      c[10] = level_two_c[1][2];
-      c[11] = level_two_c[1][3];
-      c[12] = level_two_c[1][4];
-      c[13] = level_two_c[1][5];
-      c[14] = level_two_c[1][6];
-      c[15] = (c[7] & level_two_p[1]) | level_two_g[1];
-      c[16] = level_two_c[2][0];
-      c[17] = level_two_c[2][1];
-      c[18] = level_two_c[2][2];
-      c[19] = level_two_c[2][3];
-      c[20] = level_two_c[2][4];
-      c[21] = level_two_c[2][5];
-      c[22] = level_two_c[2][6];
-      c[23] = (c[15] & level_two_p[2]) | level_two_g[2];
-      c[24] = level_two_c[3][0];
-      c[25] = level_two_c[3][1];
-      c[26] = level_two_c[3][2];
-      c[27] = level_two_c[3][3];
-      c[28] = level_two_c[3][4];
-      c[29] = level_two_c[3][5];
-      c[30] = level_two_c[3][6];
-      c[31] = (c[23] & level_two_p[3]) | level_two_g[3];
-   end
-
-   genvar l;
+   // compute sum from g/p/c
+   genvar j;
    generate
-      for (l = 0; l < 32; l = l + 1) begin
-         assign sum[l] = a[l] ^ b[l] ^ c[l];
+      for (j = 0; j < 32; j = j + 1) begin
+         assign sum[j] = a[j] ^ b[j] ^ c[j];
       end
    endgenerate 
+
 endmodule
