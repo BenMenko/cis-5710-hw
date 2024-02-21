@@ -21,10 +21,19 @@ module RegFile (
     input logic we,
     input logic rst
 );
+
   localparam int NumRegs = 32;
   logic [`REG_SIZE] regs[NumRegs];
 
-  // TODO: your code here
+
+  begin if (we)
+    reg[rd] = rd_data
+
+
+  assign rs1_data = reg[rs1]
+
+  assign rs2_data = reg[rs2]
+
 
 endmodule
 
@@ -195,6 +204,7 @@ module DatapathSingleCycle (
       OpLui: begin
         // TODO: start here by implementing lui
       end
+
       default: begin
         illegal_insn = 1'b1;
       end
