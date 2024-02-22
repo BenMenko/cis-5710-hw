@@ -17,6 +17,7 @@ module RegFile (
     input logic [4:0] rs2,
     output logic [`REG_SIZE] rs2_data,
 
+
     input logic clk,
     input logic we,
     input logic rst
@@ -25,15 +26,17 @@ module RegFile (
   localparam int NumRegs = 32;
   logic [`REG_SIZE] regs[NumRegs];
 
+  begin always_ff (@posedge clk)
 
-  begin if (we)
-    reg[rd] = rd_data
+    begin if (we)
+      reg[rd] = rd_data
+    end
 
-
-  assign rs1_data = reg[rs1]
-
-  assign rs2_data = reg[rs2]
-
+    // mux
+    assign rs1_data = reg[rs1]
+    assign rs2_data = reg[rs2]
+    
+  end
 
 endmodule
 
