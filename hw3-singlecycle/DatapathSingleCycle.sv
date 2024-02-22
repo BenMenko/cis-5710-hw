@@ -22,22 +22,49 @@ module RegFile (
     input logic we,
     input logic rst
 );
-
   localparam int NumRegs = 32;
   logic [`REG_SIZE] regs[NumRegs];
 
-  begin always_ff (@posedge clk)
 
-    begin if (we)
-      reg[rd] = rd_data
+  // read ports
+  // assign output data unless its r0, which is hard-wired to 0
+  // assign rs1_data = (rs1 != 0) ? regs[rs1] : 0;
+  // assign rs2_data = (rs2 != 0) ? regs[rs2] : 0;
+
+
+  always_comb begin
+    if (rs1 == 0) begin
+      assign rs1_data = 0;
+    end else begin
+      assign rs1_data = regs[rs1];
     end
 
-    // mux
-    assign rs1_data = reg[rs1]
-    assign rs2_data = reg[rs2]
-    
+    if (rs2 == 0) begin
+      assign rs2_data = 0;
+    end else begin
+      assign rs2_data = regs[rs2];
+    end
   end
 
+
+  // on the rising edge
+  always_ff @(posedge clk or posedge rst) begin
+
+    // reset
+    if (rst) begin
+      for (int i = 0; i < NumRegs; i++) begin
+        regs[i] <= 0;
+      end
+    end
+
+    // write port
+    else if (we) begin
+      if (rd != 0) begin
+        regs[rd] <= rd_data;
+      end
+    end
+
+  end
 endmodule
 
 module DatapathSingleCycle (
