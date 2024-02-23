@@ -212,9 +212,10 @@ module cla
    );
 
    wire [31:0] c;
-   assign c[6:0] = c0;
-   assign c[7] = cin2;
-   assign c[15:8] = c1;
+   assign c[0] = cin;
+   assign c[7:1] = c0;
+   assign c[8] = cin2;
+   assign c[15:9] = c1;
    assign c[16] = cin3;
    assign c[23:17] = c2;
    assign c[24] = cin4;
