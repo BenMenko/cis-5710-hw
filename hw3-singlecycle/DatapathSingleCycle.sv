@@ -28,10 +28,6 @@ module RegFile (
 
   // read ports
   // assign output data unless its r0, which is hard-wired to 0
-  // assign rs1_data = (rs1 != 0) ? regs[rs1] : 0;
-  // assign rs2_data = (rs2 != 0) ? regs[rs2] : 0;
-
-
   always_comb begin
     if (rs1 == 0) begin
       assign rs1_data = 0;
@@ -63,7 +59,6 @@ module RegFile (
         regs[rd] <= rd_data;
       end
     end
-
   end
 endmodule
 

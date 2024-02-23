@@ -153,13 +153,72 @@ module cla
    genvar i;
    generate
       for (i = 0; i < 32; i = i + 1) begin
-         gp1 bit1(.a(a[i]), .b(b[i]), .g(level_one_g[i]), .p(level_one_p[i]));
+         gp1 bit1(.a(a[i]), 
+                  .b(b[i]), 
+                  .g(level_one_g[i]), 
+                  .p(level_one_p[i]));
       end
    endgenerate
 
-   // 1 x 32-bit module
+
+   // 4 x 8-bit modules
+   wire g0, g1, g2, g3;
+   wire p0, p1, p2, p3;
+   wire [6:0] c0, c1, c2, c3;
+
+   gp8 gp0(
+      .gin(level_one_g[7:0]),
+      .pin(level_one_p[7:0]),
+      .cin(cin),
+      .gout(g0),
+      .pout(p0),
+      .cout(c0)
+   );
+
+   wire cin2;
+   assign cin2 = ((cin & p0) | g0);
+
+   gp8 gp1(
+      .gin(level_one_g[15:8]),
+      .pin(level_one_p[15:8]),
+      .cin(cin2),
+      .gout(g1),
+      .pout(p1),
+      .cout(c1)
+   );
+
+   wire cin3;
+   assign cin3 = ((cin & p0 & p1) | (g0 & p1) | g1);
+
+   gp8 gp2(
+      .gin(level_one_g[23:16]),
+      .pin(level_one_p[23:16]),
+      .cin(cin3), 
+      .gout(g2),
+      .pout(p2),
+      .cout(c2)
+   );
+
+   wire cin4;
+   assign cin4 = ((cin & p0 & p1 & p2) | (g0 & p1 & p2) | (g1 & p2) | g2);
+
+   gp8 gp3(
+      .gin(level_one_g[31:24]),
+      .pin(level_one_p[31:24]),
+      .cin(cin4),
+      .gout(g3),
+      .pout(p3),
+      .cout(c3)
+   );
+
    wire [31:0] c;
-   gp32 full_add(.gin(level_one_g), .pin(level_one_p), .cin(cin), .cout(c));
+   assign c[6:0] = c0;
+   assign c[7] = cin2;
+   assign c[15:8] = c1;
+   assign c[16] = cin3;
+   assign c[23:17] = c2;
+   assign c[24] = cin4;
+   assign c[31:25] = c3;
 
    // compute sum from g/p/c
    genvar j;
